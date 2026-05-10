@@ -5,10 +5,11 @@ import { COLORS, TYPOGRAPHY, SPACING, SHADOWS, BORDER_RADIUS } from '../theme';
 
 interface ItemCardProps {
   project: Project;
+  cardWidth: number;
   onPress?: (project: Project) => void;
 }
 
-const ItemCard = ({ project, onPress }: ItemCardProps) => {
+const ItemCard = ({ project, cardWidth, onPress }: ItemCardProps) => {
   const getStatusColor = (status: Project['status']) => {
     switch (status) {
       case 'Completado':
@@ -28,6 +29,7 @@ const ItemCard = ({ project, onPress }: ItemCardProps) => {
     <Pressable
       style={({ pressed }) => [
         styles.card,
+        { width: cardWidth },
         pressed && styles.cardPressed,
       ]}
       onPress={() => onPress?.(project)}
@@ -41,21 +43,11 @@ const ItemCard = ({ project, onPress }: ItemCardProps) => {
           {project.clientName}
         </Text>
         
-        <View style={styles.detailsRow}>
-          <Text style={styles.language}>
-            {project.sourceLanguage} → {project.targetLanguage}
-          </Text>
-        </View>
-
-        <View style={styles.metaRow}>
-          <Text style={styles.metaText}>{project.category}</Text>
-          <Text style={styles.metaText}>{project.wordCount.toLocaleString()} palabras</Text>
-        </View>
+        <Text style={styles.language}>
+          {project.sourceLanguage} → {project.targetLanguage}
+        </Text>
 
         <View style={styles.footer}>
-          <Text style={styles.translator} numberOfLines={1}>
-            👤 {project.translatorName}
-          </Text>
           <View style={[styles.statusBadge, { backgroundColor: getStatusColor(project.status) + '20' }]}>
             <Text style={[styles.statusText, { color: getStatusColor(project.status) }]}>
               {project.status}
@@ -70,10 +62,8 @@ const ItemCard = ({ project, onPress }: ItemCardProps) => {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: COLORS.card,
-    borderRadius: BORDER_RADIUS.lg,
-    marginHorizontal: SPACING.lg,
-    marginVertical: SPACING.sm,
-    ...SHADOWS.medium,
+    borderRadius: BORDER_RADIUS.md,
+    ...SHADOWS.small,
     overflow: 'hidden',
   },
   cardPressed: {
@@ -82,57 +72,41 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 160,
+    height: 90,
     resizeMode: 'cover',
   },
   content: {
-    padding: SPACING.lg,
+    padding: SPACING.sm,
   },
   projectName: {
-    fontSize: TYPOGRAPHY.xl,
+    fontSize: TYPOGRAPHY.sm,
     fontWeight: TYPOGRAPHY.bold,
     color: COLORS.text,
-    marginBottom: SPACING.xs,
+    marginBottom: 2,
+    lineHeight: 18,
   },
   clientName: {
-    fontSize: TYPOGRAPHY.md,
+    fontSize: TYPOGRAPHY.xs,
     color: COLORS.textSecondary,
-    marginBottom: SPACING.sm,
-  },
-  detailsRow: {
-    marginBottom: SPACING.sm,
+    marginBottom: 4,
   },
   language: {
-    fontSize: TYPOGRAPHY.md,
+    fontSize: TYPOGRAPHY.xs,
     color: COLORS.accent,
     fontWeight: TYPOGRAPHY.semibold,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: SPACING.md,
-  },
-  metaText: {
-    fontSize: TYPOGRAPHY.sm,
-    color: COLORS.textMuted,
+    marginBottom: SPACING.sm,
   },
   footer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  translator: {
-    fontSize: TYPOGRAPHY.sm,
-    color: COLORS.textSecondary,
-    flex: 1,
+    justifyContent: 'flex-end',
   },
   statusBadge: {
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
     borderRadius: BORDER_RADIUS.full,
   },
   statusText: {
-    fontSize: TYPOGRAPHY.xs,
+    fontSize: 10,
     fontWeight: TYPOGRAPHY.semibold,
   },
 });

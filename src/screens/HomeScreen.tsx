@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,16 +8,33 @@ import {
   KeyboardAvoidingView,
   Platform,
   ListRenderItem,
+  Dimensions,
 } from 'react-native';
 import { mockProjects } from '../data/mockData';
 import { Project } from '../types';
 import ItemCard from '../components/ItemCard';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS } from '../theme';
 
+const getCardWidth = () => {
+  const { width } = Dimensions.get('window');
+  const NUM_COLUMNS = 2;
+  const GAP = 12;
+  const SIDE_MARGIN = 24;
+  return (width - (SIDE_MARGIN * 2) - GAP) / NUM_COLUMNS;
+};
+
 export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [cardWidth, setCardWidth] = useState(getCardWidth());
 
-  // useMemo para filtrar la lista
+  // Escuchar cambios de tamaño de pantalla
+  useEffect(() => {
+    const subscription = Dimensions.addEventListener('change', () => {
+      setCardWidth(getCardWidth());
+    });
+    return () => subscription?.remove();
+  }, []);
+
   const filteredProjects = useMemo(() => {
     if (!searchQuery.trim()) {
       return mockProjects;
@@ -34,17 +51,18 @@ export default function HomeScreen() {
     );
   }, [searchQuery]);
 
-  // useCallback para renderItem
   const renderItem: ListRenderItem<Project> = useCallback(({ item }) => (
-    <ItemCard
-      project={item}
-      onPress={(project) => {
-        console.log(`Proyecto seleccionado: ${project.projectName}`);
-      }}
-    />
-  ), []);
+    <View style={styles.cardWrapper}>
+      <ItemCard
+        project={item}
+        cardWidth={cardWidth}
+        onPress={(project) => {
+          console.log(`Proyecto seleccionado: ${project.projectName}`);
+        }}
+      />
+    </View>
+  ), [cardWidth]);
 
-  // useCallback para empty state
   const ListEmptyComponent = useCallback(() => (
     <View style={styles.emptyContainer}>
       <Text style={styles.emptyIcon}>🔍</Text>
@@ -53,11 +71,6 @@ export default function HomeScreen() {
         Intenta buscar con otro término
       </Text>
     </View>
-  ), []);
-
-  // ItemSeparatorComponent
-  const ItemSeparatorComponent = useCallback(() => (
-    <View style={styles.separator} />
   ), []);
 
   return (
@@ -70,25 +83,27 @@ export default function HomeScreen() {
         <Text style={styles.headerSubtitle}>Empresa de Traducción</Text>
       </View>
 
-      <View style={styles.searchContainer}>
-        <Text style={styles.searchIcon}>🔍</Text>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar proyectos..."
-          placeholderTextColor={COLORS.textMuted}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
-        {searchQuery.length > 0 && (
-          <Text
-            style={styles.clearButton}
-            onPress={() => setSearchQuery('')}
-          >
-            ✕
-          </Text>
-        )}
+      <View style={styles.searchWrapper}>
+        <View style={styles.searchContainer}>
+          <Text style={styles.searchIcon}>🔍</Text>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar proyectos..."
+            placeholderTextColor={COLORS.textMuted}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          {searchQuery.length > 0 && (
+            <Text
+              style={styles.clearButton}
+              onPress={() => setSearchQuery('')}
+            >
+              ✕
+            </Text>
+          )}
+        </View>
       </View>
 
       <Text style={styles.resultsText}>
@@ -99,15 +114,19 @@ export default function HomeScreen() {
         data={filteredProjects}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        ItemSeparatorComponent={ItemSeparatorComponent}
+        numColumns={2}
         ListEmptyComponent={ListEmptyComponent}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
         keyboardShouldPersistTaps="handled"
+        extraData={cardWidth}
       />
     </KeyboardAvoidingView>
   );
 }
+
+const { width } = Dimensions.get('window');
+const SIDE_MARGIN = 24;
 
 const styles = StyleSheet.create({
   container: {
@@ -116,28 +135,30 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: COLORS.primary,
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
-    paddingBottom: SPACING.xl,
+    paddingTop: Platform.OS === 'ios' ? 50 : 30,
+    paddingBottom: SPACING.lg,
     paddingHorizontal: SPACING.lg,
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: TYPOGRAPHY.xxxl,
+    fontSize: TYPOGRAPHY.xxl,
     fontWeight: TYPOGRAPHY.bold,
     color: COLORS.white,
   },
   headerSubtitle: {
-    fontSize: TYPOGRAPHY.md,
+    fontSize: TYPOGRAPHY.sm,
     color: COLORS.textMuted,
-    marginTop: SPACING.xs,
+    marginTop: 2,
+  },
+  searchWrapper: {
+    paddingHorizontal: SIDE_MARGIN,
+    marginTop: SPACING.md,
+    marginBottom: SPACING.sm,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.card,
-    marginHorizontal: SPACING.lg,
-    marginTop: -SPACING.md,
-    marginBottom: SPACING.md,
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
@@ -145,7 +166,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   searchIcon: {
-    fontSize: TYPOGRAPHY.lg,
+    fontSize: TYPOGRAPHY.md,
     marginRight: SPACING.sm,
   },
   searchInput: {
@@ -162,27 +183,29 @@ const styles = StyleSheet.create({
   resultsText: {
     fontSize: TYPOGRAPHY.sm,
     color: COLORS.textMuted,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SIDE_MARGIN,
     marginBottom: SPACING.sm,
   },
   listContent: {
+    paddingHorizontal: SIDE_MARGIN,
     paddingBottom: SPACING.xxl,
   },
-  separator: {
-    height: SPACING.xs,
+  cardWrapper: {
+    marginRight: 12,
+    marginBottom: 12,
   },
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: SPACING.xxxl,
-    paddingHorizontal: SPACING.lg,
+    width: width - (SIDE_MARGIN * 2),
   },
   emptyIcon: {
     fontSize: 48,
     marginBottom: SPACING.md,
   },
   emptyTitle: {
-    fontSize: TYPOGRAPHY.xl,
+    fontSize: TYPOGRAPHY.lg,
     fontWeight: TYPOGRAPHY.semibold,
     color: COLORS.text,
     marginBottom: SPACING.xs,
