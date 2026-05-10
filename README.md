@@ -1,6 +1,6 @@
-# 🌐 TranslatePro - Proyecto Semana 01
+# 🌐 TranslatePro - Proyecto Semana 02
 
-**Bootcamp React Native** | Matrícula: 3171618  
+**Bootcamp React Native** | ADSO 3171618  
 **Estudiante:** Cristopher Joel León  
 **Dominio asignado:** Empresa de Traducción
 
@@ -8,25 +8,49 @@
 
 ## 📱 Descripción
 
-Aplicación de pantalla única que muestra una lista de proyectos de traducción en formato de tarjetas (cards). Cada tarjeta presenta información detallada sobre un proyecto: nombre del proyecto, cliente, idiomas de traducción, traductor asignado y estado del proyecto.
+Aplicación de listas con búsqueda en tiempo real que muestra proyectos de traducción. Incluye theming consistente, filtrado optimizado con useMemo, y callbacks memorizados para mejor rendimiento.
 
 ---
 
+## 🏗️ Estructura del Proyecto
+starter/
+├── App.tsx                  # Punto de entrada
+├── app.json                 # Configuración Expo
+├── package.json             # Dependencias
+├── tsconfig.json            # Configuración TypeScript
+├── README.md                # Este archivo
+└── src/
+├── types/
+│   └── index.ts         # Interfaz Project
+├── data/
+│   └── mockData.ts      # 11 proyectos de traducción
+├── components/
+│   └── ItemCard.tsx     # Tarjeta reutilizable con theming
+├── screens/
+│   └── HomeScreen.tsx   # Pantalla con FlatList + búsqueda
+└── theme/
+└── index.ts         # COLORS, TYPOGRAPHY, SPACING, SHADOWS
+plain
+Copy
+
 ---
 
-## ✅ Requisitos Realizados
+## ✅ Requisitos Cumplidos - Semana 02
 
 | Requisito | Estado |
 |-----------|--------|
-| Pantalla principal con lista de tarjetas | ✅ FlatList con 2 columnas |
-| Mínimo 3 tarjetas con datos del dominio | ✅ 4 proyectos de traducción |
-| Imagen en cada tarjeta | ✅ URL de Unsplash |
-| 2+ textos con estilos distintos | ✅ Título, cliente, idiomas, traductor |
-| Pressable con feedback visual | ✅ Efecto al presionar |
-| Header con nombre del dominio | ✅ TranslatePro |
-| StyleSheet.create (sin inline) | ✅ Todos los estilos |
-| TypeScript con interfaces | ✅ Interfaz Project |
-| Grid de 2 columnas | ✅ FlatList numColumns={2} |
+| FlatList con mínimo 10 items | ✅ 11 proyectos de traducción |
+| Búsqueda en tiempo real | ✅ TextInput con filtrado instantáneo |
+| Estado vacío personalizado | ✅ Mensaje cuando no hay resultados |
+| ItemCard con 3+ campos | ✅ 7 campos mostrados |
+| KeyboardAvoidingView | ✅ Teclado no tapa el contenido |
+| Theming con constantes | ✅ COLORS, TYPOGRAPHY, SPACING, SHADOWS |
+| keyExtractor con id | ✅ Nunca usa índice del array |
+| useMemo para filtrado | ✅ `filteredProjects` memorizado |
+| useCallback para renderItem | ✅ `renderItem` memorizado |
+| useCallback para empty state | ✅ `ListEmptyComponent` memorizado |
+| ItemSeparatorComponent | ✅ Separador visual entre tarjetas |
+| TypeScript estricto | ✅ Sin any |
 
 ---
 
@@ -36,3 +60,11 @@ Aplicación de pantalla única que muestra una lista de proyectos de traducción
 cd ProyectoRN
 npm install
 npx expo start
+
+Presiona w para abrir en navegador web.
+
+📋 Ramas del Proyecto
+Table
+Rama	Contenido
+semana-01	App de Tarjetas (Semana 01)
+semana-02	App de Listas con Búsqueda (Semana 02)
