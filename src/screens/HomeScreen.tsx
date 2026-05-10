@@ -1,65 +1,195 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet, Dimensions } from 'react-native';
+import React, { useState, useMemo, useCallback } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  TextInput,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ListRenderItem,
+} from 'react-native';
 import { mockProjects } from '../data/mockData';
+import { Project } from '../types';
 import ItemCard from '../components/ItemCard';
-
-const { width } = Dimensions.get('window');
-const NUM_COLUMNS = 2;
-const CARD_MARGIN = 8;
-const CARD_WIDTH = (width - 48) / NUM_COLUMNS; // 48 = márgenes laterales (16*2) + espacio entre columnas (16)
+import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS } from '../theme';
 
 export default function HomeScreen() {
-  const renderItem = ({ item }: { item: typeof mockProjects[0] }) => (
-    <View style={styles.cardWrapper}>
-      <ItemCard project={item} cardWidth={CARD_WIDTH} />
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // useMemo para filtrar la lista
+  const filteredProjects = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return mockProjects;
+    }
+    
+    const query = searchQuery.toLowerCase().trim();
+    return mockProjects.filter((project) =>
+      project.projectName.toLowerCase().includes(query) ||
+      project.clientName.toLowerCase().includes(query) ||
+      project.translatorName.toLowerCase().includes(query) ||
+      project.sourceLanguage.toLowerCase().includes(query) ||
+      project.targetLanguage.toLowerCase().includes(query) ||
+      project.category.toLowerCase().includes(query)
+    );
+  }, [searchQuery]);
+
+  // useCallback para renderItem
+  const renderItem: ListRenderItem<Project> = useCallback(({ item }) => (
+    <ItemCard
+      project={item}
+      onPress={(project) => {
+        console.log(`Proyecto seleccionado: ${project.projectName}`);
+      }}
+    />
+  ), []);
+
+  // useCallback para empty state
+  const ListEmptyComponent = useCallback(() => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyIcon}>🔍</Text>
+      <Text style={styles.emptyTitle}>No se encontraron proyectos</Text>
+      <Text style={styles.emptySubtitle}>
+        Intenta buscar con otro término
+      </Text>
     </View>
-  );
+  ), []);
+
+  // ItemSeparatorComponent
+  const ItemSeparatorComponent = useCallback(() => (
+    <View style={styles.separator} />
+  ), []);
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
       <View style={styles.header}>
         <Text style={styles.headerTitle}>🌐 TranslatePro</Text>
         <Text style={styles.headerSubtitle}>Empresa de Traducción</Text>
       </View>
+
+      <View style={styles.searchContainer}>
+        <Text style={styles.searchIcon}>🔍</Text>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar proyectos..."
+          placeholderTextColor={COLORS.textMuted}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+        {searchQuery.length > 0 && (
+          <Text
+            style={styles.clearButton}
+            onPress={() => setSearchQuery('')}
+          >
+            ✕
+          </Text>
+        )}
+      </View>
+
+      <Text style={styles.resultsText}>
+        {filteredProjects.length} {filteredProjects.length === 1 ? 'proyecto' : 'proyectos'} encontrados
+      </Text>
+
       <FlatList
-        data={mockProjects}
+        data={filteredProjects}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        numColumns={NUM_COLUMNS}
-        contentContainerStyle={styles.listContent}
+        ItemSeparatorComponent={ItemSeparatorComponent}
+        ListEmptyComponent={ListEmptyComponent}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContent}
+        keyboardShouldPersistTaps="handled"
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: COLORS.background,
   },
   header: {
-    backgroundColor: '#1a1a2e',
-    paddingTop: 50,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
+    backgroundColor: COLORS.primary,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    paddingBottom: SPACING.xl,
+    paddingHorizontal: SPACING.lg,
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#ffffff',
+    fontSize: TYPOGRAPHY.xxxl,
+    fontWeight: TYPOGRAPHY.bold,
+    color: COLORS.white,
   },
   headerSubtitle: {
-    fontSize: 14,
-    color: '#a0a0a0',
-    marginTop: 4,
+    fontSize: TYPOGRAPHY.md,
+    color: COLORS.textMuted,
+    marginTop: SPACING.xs,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.card,
+    marginHorizontal: SPACING.lg,
+    marginTop: -SPACING.md,
+    marginBottom: SPACING.md,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  searchIcon: {
+    fontSize: TYPOGRAPHY.lg,
+    marginRight: SPACING.sm,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: TYPOGRAPHY.md,
+    color: COLORS.text,
+    paddingVertical: 0,
+  },
+  clearButton: {
+    fontSize: TYPOGRAPHY.md,
+    color: COLORS.textMuted,
+    padding: SPACING.xs,
+  },
+  resultsText: {
+    fontSize: TYPOGRAPHY.sm,
+    color: COLORS.textMuted,
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.sm,
   },
   listContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
+    paddingBottom: SPACING.xxl,
   },
-  cardWrapper: {
-    margin: CARD_MARGIN,
+  separator: {
+    height: SPACING.xs,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.xxxl,
+    paddingHorizontal: SPACING.lg,
+  },
+  emptyIcon: {
+    fontSize: 48,
+    marginBottom: SPACING.md,
+  },
+  emptyTitle: {
+    fontSize: TYPOGRAPHY.xl,
+    fontWeight: TYPOGRAPHY.semibold,
+    color: COLORS.text,
+    marginBottom: SPACING.xs,
+  },
+  emptySubtitle: {
+    fontSize: TYPOGRAPHY.md,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
   },
 });

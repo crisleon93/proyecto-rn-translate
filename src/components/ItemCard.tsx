@@ -1,57 +1,79 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import { Project } from '../types';
+import { COLORS, TYPOGRAPHY, SPACING, SHADOWS, BORDER_RADIUS } from '../theme';
 
 interface ItemCardProps {
   project: Project;
-  cardWidth: number;
+  onPress?: (project: Project) => void;
 }
 
-export default function ItemCard({ project, cardWidth }: ItemCardProps) {
+const ItemCard = ({ project, onPress }: ItemCardProps) => {
+  const getStatusColor = (status: Project['status']) => {
+    switch (status) {
+      case 'Completado':
+        return COLORS.success;
+      case 'En progreso':
+        return COLORS.warning;
+      case 'Pendiente':
+        return COLORS.danger;
+      case 'En revisión':
+        return COLORS.info;
+      default:
+        return COLORS.textMuted;
+    }
+  };
+
   return (
     <Pressable
       style={({ pressed }) => [
         styles.card,
-        { width: cardWidth },
         pressed && styles.cardPressed,
       ]}
-      onPress={() => {
-        console.log(`Proyecto seleccionado: ${project.projectName}`);
-      }}
+      onPress={() => onPress?.(project)}
     >
       <Image source={{ uri: project.imageUrl }} style={styles.image} />
       <View style={styles.content}>
-        <Text style={styles.projectName} numberOfLines={2}>{project.projectName}</Text>
-        <Text style={styles.clientName} numberOfLines={1}>{project.clientName}</Text>
-        <Text style={styles.language}>
-          {project.sourceLanguage} → {project.targetLanguage}
+        <Text style={styles.projectName} numberOfLines={2}>
+          {project.projectName}
         </Text>
+        <Text style={styles.clientName} numberOfLines={1}>
+          {project.clientName}
+        </Text>
+        
+        <View style={styles.detailsRow}>
+          <Text style={styles.language}>
+            {project.sourceLanguage} → {project.targetLanguage}
+          </Text>
+        </View>
+
+        <View style={styles.metaRow}>
+          <Text style={styles.metaText}>{project.category}</Text>
+          <Text style={styles.metaText}>{project.wordCount.toLocaleString()} palabras</Text>
+        </View>
+
         <View style={styles.footer}>
-          <Text style={styles.translator} numberOfLines={1}>👤 {project.translatorName}</Text>
-          <View style={[
-            styles.statusBadge,
-            project.status === 'Completado' && styles.statusCompleted,
-            project.status === 'En progreso' && styles.statusInProgress,
-            project.status === 'Pendiente' && styles.statusPending,
-            project.status === 'En revisión' && styles.statusReview,
-          ]}>
-            <Text style={styles.statusText}>{project.status}</Text>
+          <Text style={styles.translator} numberOfLines={1}>
+            👤 {project.translatorName}
+          </Text>
+          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(project.status) + '20' }]}>
+            <Text style={[styles.statusText, { color: getStatusColor(project.status) }]}>
+              {project.status}
+            </Text>
           </View>
         </View>
       </View>
     </Pressable>
   );
-}
+};
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    backgroundColor: COLORS.card,
+    borderRadius: BORDER_RADIUS.lg,
+    marginHorizontal: SPACING.lg,
+    marginVertical: SPACING.sm,
+    ...SHADOWS.medium,
     overflow: 'hidden',
   },
   cardPressed: {
@@ -60,28 +82,39 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 120,
+    height: 160,
     resizeMode: 'cover',
   },
   content: {
-    padding: 12,
+    padding: SPACING.lg,
   },
   projectName: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#1a1a2e',
-    marginBottom: 2,
+    fontSize: TYPOGRAPHY.xl,
+    fontWeight: TYPOGRAPHY.bold,
+    color: COLORS.text,
+    marginBottom: SPACING.xs,
   },
   clientName: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 6,
+    fontSize: TYPOGRAPHY.md,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.sm,
+  },
+  detailsRow: {
+    marginBottom: SPACING.sm,
   },
   language: {
-    fontSize: 11,
-    color: '#4a90d9',
-    fontWeight: '600',
-    marginBottom: 8,
+    fontSize: TYPOGRAPHY.md,
+    color: COLORS.accent,
+    fontWeight: TYPOGRAPHY.semibold,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: SPACING.md,
+  },
+  metaText: {
+    fontSize: TYPOGRAPHY.sm,
+    color: COLORS.textMuted,
   },
   footer: {
     flexDirection: 'row',
@@ -89,31 +122,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   translator: {
-    fontSize: 11,
-    color: '#555',
+    fontSize: TYPOGRAPHY.sm,
+    color: COLORS.textSecondary,
     flex: 1,
   },
   statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
-    backgroundColor: '#e0e0e0',
-  },
-  statusCompleted: {
-    backgroundColor: '#d4edda',
-  },
-  statusInProgress: {
-    backgroundColor: '#fff3cd',
-  },
-  statusPending: {
-    backgroundColor: '#f8d7da',
-  },
-  statusReview: {
-    backgroundColor: '#cce5ff',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.full,
   },
   statusText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#333',
+    fontSize: TYPOGRAPHY.xs,
+    fontWeight: TYPOGRAPHY.semibold,
   },
 });
+
+export default memo(ItemCard);
