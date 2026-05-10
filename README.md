@@ -1,4 +1,4 @@
-# 🌐 TranslatePro - Proyecto Semana 02
+# 🌐 TranslatePro - Proyecto Semana 03
 
 **Bootcamp React Native** | ADSO 3171618  
 **Estudiante:** Cristopher Joel León  
@@ -8,49 +8,52 @@
 
 ## 📱 Descripción
 
-Aplicación de listas con búsqueda en tiempo real que muestra proyectos de traducción. Incluye theming consistente, filtrado optimizado con useMemo, y callbacks memorizados para mejor rendimiento.
+Aplicación móvil con navegación completa usando **React Navigation 7**. Incluye Tab Navigator con pestañas de Proyectos y Favoritos, Stack Navigator anidado para navegar de lista a detalle, tipado completo de parámetros, iconos en el Tab Bar y theming consistente.
 
 ---
 
 ## 🏗️ Estructura del Proyecto
 starter/
-├── App.tsx                  # Punto de entrada
-├── app.json                 # Configuración Expo
-├── package.json             # Dependencias
-├── tsconfig.json            # Configuración TypeScript
-├── README.md                # Este archivo
+├── App.tsx                         # Punto de entrada
+├── app.json                        # Configuración Expo
+├── package.json                    # Dependencias exactas
+├── tsconfig.json                   # Configuración TypeScript
+├── README.md                       # Este archivo
 └── src/
-├── types/
-│   └── index.ts         # Interfaz Project
-├── data/
-│   └── mockData.ts      # 11 proyectos de traducción
-├── components/
-│   └── ItemCard.tsx     # Tarjeta reutilizable con theming
+├── navigation/
+│   ├── RootNavigator.tsx       # Tab + Stack anidado
+│   └── types.ts                # RootTabParamList, HomeStackParamList
 ├── screens/
-│   └── HomeScreen.tsx   # Pantalla con FlatList + búsqueda
+│   ├── HomeScreen.tsx          # Lista de proyectos (FlatList + búsqueda)
+│   ├── DetailScreen.tsx        # Detalle del proyecto con params
+│   └── FavoritesScreen.tsx     # Pestaña de favoritos
+├── data/
+│   └── mockData.ts             # 11 proyectos de traducción
+├── types/
+│   └── index.ts                # Interface Project
 └── theme/
-└── index.ts         # COLORS, TYPOGRAPHY, SPACING, SHADOWS
+└── index.ts                # COLORS, TYPOGRAPHY, SPACING, SHADOWS
 plain
 Copy
 
 ---
 
-## ✅ Requisitos Cumplidos - Semana 02
+## ✅ Requisitos Cumplidos - Semana 03
 
 | Requisito | Estado |
 |-----------|--------|
-| FlatList con mínimo 10 items | ✅ 11 proyectos de traducción |
-| Búsqueda en tiempo real | ✅ TextInput con filtrado instantáneo |
-| Estado vacío personalizado | ✅ Mensaje cuando no hay resultados |
-| ItemCard con 3+ campos | ✅ 7 campos mostrados |
-| KeyboardAvoidingView | ✅ Teclado no tapa el contenido |
-| Theming con constantes | ✅ COLORS, TYPOGRAPHY, SPACING, SHADOWS |
-| keyExtractor con id | ✅ Nunca usa índice del array |
-| useMemo para filtrado | ✅ `filteredProjects` memorizado |
-| useCallback para renderItem | ✅ `renderItem` memorizado |
-| useCallback para empty state | ✅ `ListEmptyComponent` memorizado |
-| ItemSeparatorComponent | ✅ Separador visual entre tarjetas |
-| TypeScript estricto | ✅ Sin any |
+| Tab Navigator con 2 pestañas | ✅ Home (Proyectos) y Favorites |
+| Stack anidado en Home | ✅ HomeList → HomeDetail |
+| Params tipados (`id`, `projectName`) | ✅ Pasados y tipados sin `any` |
+| Iconos en Tab Bar (Ionicons) | ✅ `list` y `heart` con estados |
+| `tabBarActiveTintColor: #61DAFB` | ✅ Exacto |
+| Tipado completo | ✅ `RootTabParamList` + `HomeStackParamList` |
+| HomeScreen con FlatList | ✅ 11 proyectos con búsqueda |
+| DetailScreen con `useRoute` | ✅ Lee params y muestra detalle |
+| FavoritesScreen con 3+ ítems | ✅ 3 proyectos favoritos estáticos |
+| Títulos descriptivos en header | ✅ "Proyectos" y "Detalle del Proyecto" |
+| Dominio propio y coherente | ✅ Empresa de Traducción |
+| TypeScript estricto | ✅ Sin `any` |
 
 ---
 
@@ -60,11 +63,10 @@ Copy
 cd ProyectoRN
 npm install
 npx expo start
-
-Presiona w para abrir en navegador web.
-
+Presiona w para abrir en navegador web, i para iOS o a para Android.
 📋 Ramas del Proyecto
 Table
 Rama	Contenido
 semana-01	App de Tarjetas (Semana 01)
 semana-02	App de Listas con Búsqueda (Semana 02)
+semana-03	App con React Navigation 7 (Semana 03)

@@ -9,25 +9,46 @@ import {
   Platform,
   ListRenderItem,
   Dimensions,
+  Pressable,
+  Image,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { mockProjects } from '../data/mockData';
 import { Project } from '../types';
-import ItemCard from '../components/ItemCard';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS } from '../theme';
+import type { HomeStackParamList } from '../navigation/types';
 
 const getCardWidth = () => {
   const { width } = Dimensions.get('window');
   const NUM_COLUMNS = 2;
-  const GAP = 12;
-  const SIDE_MARGIN = 24;
+  const GAP = 16;
+  const SIDE_MARGIN = 20;
   return (width - (SIDE_MARGIN * 2) - GAP) / NUM_COLUMNS;
 };
 
+type HomeScreenNavigationProp = NativeStackNavigationProp<HomeStackParamList, 'HomeList'>;
+
+const getStatusColor = (status: Project['status']) => {
+  switch (status) {
+    case 'Completado':
+      return COLORS.success;
+    case 'En progreso':
+      return COLORS.warning;
+    case 'Pendiente':
+      return COLORS.danger;
+    case 'En revisión':
+      return COLORS.info;
+    default:
+      return COLORS.textMuted;
+  }
+};
+
 export default function HomeScreen() {
+  const navigation = useNavigation<HomeScreenNavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
   const [cardWidth, setCardWidth] = useState(getCardWidth());
 
-  // Escuchar cambios de tamaño de pantalla
   useEffect(() => {
     const subscription = Dimensions.addEventListener('change', () => {
       setCardWidth(getCardWidth());
@@ -51,17 +72,41 @@ export default function HomeScreen() {
     );
   }, [searchQuery]);
 
+  const handlePress = useCallback((project: Project) => {
+    navigation.navigate('HomeDetail', {
+      id: project.id,
+      projectName: project.projectName,
+    });
+  }, [navigation]);
+
   const renderItem: ListRenderItem<Project> = useCallback(({ item }) => (
-    <View style={styles.cardWrapper}>
-      <ItemCard
-        project={item}
-        cardWidth={cardWidth}
-        onPress={(project) => {
-          console.log(`Proyecto seleccionado: ${project.projectName}`);
-        }}
-      />
-    </View>
-  ), [cardWidth]);
+    <Pressable
+      style={[styles.cardWrapper, { width: cardWidth }]}
+      onPress={() => handlePress(item)}
+    >
+      <View style={styles.card}>
+        <Image source={{ uri: item.imageUrl }} style={styles.image} />
+        <View style={styles.content}>
+          <Text style={styles.projectName} numberOfLines={2}>
+            {item.projectName}
+          </Text>
+          <Text style={styles.clientName} numberOfLines={1}>
+            {item.clientName}
+          </Text>
+          <Text style={styles.language}>
+            {item.sourceLanguage} → {item.targetLanguage}
+          </Text>
+          <View style={styles.footer}>
+            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '20' }]}>
+              <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
+                {item.status}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </Pressable>
+  ), [cardWidth, handlePress]);
 
   const ListEmptyComponent = useCallback(() => (
     <View style={styles.emptyContainer}>
@@ -78,11 +123,6 @@ export default function HomeScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>🌐 TranslatePro</Text>
-        <Text style={styles.headerSubtitle}>Empresa de Traducción</Text>
-      </View>
-
       <View style={styles.searchWrapper}>
         <View style={styles.searchContainer}>
           <Text style={styles.searchIcon}>🔍</Text>
@@ -126,73 +166,106 @@ export default function HomeScreen() {
 }
 
 const { width } = Dimensions.get('window');
-const SIDE_MARGIN = 24;
+const SIDE_MARGIN = 20;
+const GAP = 16;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  header: {
-    backgroundColor: COLORS.primary,
-    paddingTop: Platform.OS === 'ios' ? 50 : 30,
-    paddingBottom: SPACING.lg,
-    paddingHorizontal: SPACING.lg,
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: TYPOGRAPHY.xxl,
-    fontWeight: TYPOGRAPHY.bold,
-    color: COLORS.white,
-  },
-  headerSubtitle: {
-    fontSize: TYPOGRAPHY.sm,
-    color: COLORS.textMuted,
-    marginTop: 2,
-  },
   searchWrapper: {
     paddingHorizontal: SIDE_MARGIN,
-    marginTop: SPACING.md,
-    marginBottom: SPACING.sm,
+    marginTop: SPACING.lg,
+    marginBottom: SPACING.md,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.card,
     paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
+    paddingVertical: SPACING.lg,
     borderRadius: BORDER_RADIUS.lg,
     borderWidth: 1,
     borderColor: COLORS.border,
   },
   searchIcon: {
-    fontSize: TYPOGRAPHY.md,
-    marginRight: SPACING.sm,
+    fontSize: TYPOGRAPHY.lg,
+    marginRight: SPACING.md,
   },
   searchInput: {
     flex: 1,
-    fontSize: TYPOGRAPHY.md,
+    fontSize: TYPOGRAPHY.lg,
     color: COLORS.text,
     paddingVertical: 0,
   },
   clearButton: {
-    fontSize: TYPOGRAPHY.md,
+    fontSize: TYPOGRAPHY.lg,
     color: COLORS.textMuted,
     padding: SPACING.xs,
   },
   resultsText: {
-    fontSize: TYPOGRAPHY.sm,
+    fontSize: TYPOGRAPHY.md,
     color: COLORS.textMuted,
     marginHorizontal: SIDE_MARGIN,
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.md,
   },
   listContent: {
     paddingHorizontal: SIDE_MARGIN,
     paddingBottom: SPACING.xxl,
   },
   cardWrapper: {
-    marginRight: 12,
-    marginBottom: 12,
+    marginRight: GAP,
+    marginBottom: GAP,
+  },
+  card: {
+    backgroundColor: COLORS.card,
+    borderRadius: BORDER_RADIUS.lg,
+    overflow: 'hidden',
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  image: {
+    width: '100%',
+    height: 140,
+    resizeMode: 'cover',
+  },
+  content: {
+    padding: SPACING.md,
+  },
+  projectName: {
+    fontSize: TYPOGRAPHY.md,
+    fontWeight: TYPOGRAPHY.bold,
+    color: COLORS.text,
+    marginBottom: 4,
+    lineHeight: 22,
+  },
+  clientName: {
+    fontSize: TYPOGRAPHY.sm,
+    color: COLORS.textSecondary,
+    marginBottom: 6,
+  },
+  language: {
+    fontSize: TYPOGRAPHY.sm,
+    color: COLORS.accent,
+    fontWeight: TYPOGRAPHY.semibold,
+    marginBottom: SPACING.md,
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  statusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: BORDER_RADIUS.full,
+  },
+  statusText: {
+    fontSize: TYPOGRAPHY.sm,
+    fontWeight: TYPOGRAPHY.semibold,
   },
   emptyContainer: {
     alignItems: 'center',
@@ -201,17 +274,17 @@ const styles = StyleSheet.create({
     width: width - (SIDE_MARGIN * 2),
   },
   emptyIcon: {
-    fontSize: 48,
-    marginBottom: SPACING.md,
+    fontSize: 64,
+    marginBottom: SPACING.lg,
   },
   emptyTitle: {
-    fontSize: TYPOGRAPHY.lg,
+    fontSize: TYPOGRAPHY.xl,
     fontWeight: TYPOGRAPHY.semibold,
     color: COLORS.text,
-    marginBottom: SPACING.xs,
+    marginBottom: SPACING.sm,
   },
   emptySubtitle: {
-    fontSize: TYPOGRAPHY.md,
+    fontSize: TYPOGRAPHY.lg,
     color: COLORS.textSecondary,
     textAlign: 'center',
   },
