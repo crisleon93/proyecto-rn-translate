@@ -1,6 +1,5 @@
 import { NavigatorScreenParams } from '@react-navigation/native';
 
-// Tipos para el Stack de Home (lista → detalle)
 export type HomeStackParamList = {
   HomeList: undefined;
   HomeDetail: {
@@ -9,8 +8,7 @@ export type HomeStackParamList = {
   };
 };
 
-// Tipos para el Tab Navigator
 export type RootTabParamList = {
-  Home: NavigatorScreenParams<HomeStackParamList>;
-  Favorites: undefined;
+  Home: NavigatorScreenParams <HomeStackParamList>;
+  Saved: undefined;
 };

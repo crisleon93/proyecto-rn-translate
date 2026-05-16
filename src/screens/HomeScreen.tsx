@@ -104,13 +104,13 @@ export default function HomeScreen() {
           <View style={styles.imageContainer}>
             <Image source={{ uri: item.imageUrl }} style={styles.image} />
             <Pressable
-              style={styles.favoriteButton}
+              style={styles.saveButton}
               onPress={(e) => {
                 e.stopPropagation();
                 toggleFavorite(item.id);
               }}
-            >
-              <Text style={styles.favoriteIcon}>
+            > 
+              <Text style={styles.saveIcon}>
                 {isFav ? '❤️' : '🤍'}
               </Text>
             </Pressable>
@@ -197,8 +197,8 @@ export default function HomeScreen() {
 }
 
 const { width } = Dimensions.get('window');
-const SIDE_MARGIN = 20;
-const GAP = 16;
+const SIDE_MARGIN = 16;
+const GAP = 12;
 
 const styles = StyleSheet.create({
   container: {
@@ -207,43 +207,43 @@ const styles = StyleSheet.create({
   },
   searchWrapper: {
     paddingHorizontal: SIDE_MARGIN,
-    marginTop: SPACING.lg,
-    marginBottom: SPACING.md,
+    marginTop: SPACING.md,
+    marginBottom: SPACING.sm,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.card,
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.lg,
-    borderRadius: BORDER_RADIUS.lg,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.md,
+    borderRadius: BORDER_RADIUS.md,
     borderWidth: 1,
     borderColor: COLORS.border,
   },
   searchIcon: {
-    fontSize: TYPOGRAPHY.lg,
-    marginRight: SPACING.md,
+    fontSize: TYPOGRAPHY.md,
+    marginRight: SPACING.sm,
   },
   searchInput: {
     flex: 1,
-    fontSize: TYPOGRAPHY.lg,
+    fontSize: TYPOGRAPHY.md,
     color: COLORS.text,
     paddingVertical: 0,
   },
   clearButton: {
-    fontSize: TYPOGRAPHY.lg,
+    fontSize: TYPOGRAPHY.md,
     color: COLORS.textMuted,
     padding: SPACING.xs,
   },
   resultsText: {
-    fontSize: TYPOGRAPHY.md,
+    fontSize: TYPOGRAPHY.sm,
     color: COLORS.textMuted,
     marginHorizontal: SIDE_MARGIN,
-    marginBottom: SPACING.md,
+    marginBottom: SPACING.sm,
   },
   listContent: {
     paddingHorizontal: SIDE_MARGIN,
-    paddingBottom: SPACING.xxl,
+    paddingBottom: SPACING.xl,
   },
   cardWrapper: {
     marginRight: GAP,
@@ -251,86 +251,102 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: COLORS.card,
-    borderRadius: BORDER_RADIUS.lg,
+    borderRadius: BORDER_RADIUS.md,
     overflow: 'hidden',
     shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
+    shadowRadius: 3,
+    elevation: 2,
   },
   imageContainer: {
     position: 'relative',
   },
   image: {
     width: '100%',
-    height: 140,
+    height: 200, 
     resizeMode: 'cover',
   },
-  favoriteButton: {
+  saveButton: {
     position: 'absolute',
-    top: 8,
-    right: 8,
+    top: 6,
+    right: 6,
     backgroundColor: 'rgba(255,255,255,0.9)',
-    borderRadius: 20,
-    padding: 6,
+    borderRadius: 16,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
     zIndex: 10,
   },
-  favoriteIcon: {
-    fontSize: 18,
+  saveButtonActive: {
+    backgroundColor: COLORS.accent,
+  },
+  saveIcon: {
+    fontSize: 12,
+    marginRight: 3,
+  },
+  saveText: {
+    fontSize: 11,
+    color: COLORS.text,
+    fontWeight: '600',
+  },
+  saveTextActive: {
+    color: COLORS.white,
   },
   content: {
-    padding: SPACING.md,
+    padding: SPACING.sm,
+    minHeight: 100, 
   },
   projectName: {
-    fontSize: TYPOGRAPHY.md,
+    fontSize: TYPOGRAPHY.sm,
     fontWeight: TYPOGRAPHY.bold,
     color: COLORS.text,
-    marginBottom: 4,
-    lineHeight: 22,
+    marginBottom: 2,
+    lineHeight: 18,
   },
   clientName: {
-    fontSize: TYPOGRAPHY.sm,
+    fontSize: 12,
     color: COLORS.textSecondary,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   language: {
-    fontSize: TYPOGRAPHY.sm,
+    fontSize: 11,
     color: COLORS.accent,
     fontWeight: TYPOGRAPHY.semibold,
-    marginBottom: SPACING.md,
+    marginBottom: SPACING.sm,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
   },
   statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
     borderRadius: BORDER_RADIUS.full,
   },
   statusText: {
-    fontSize: TYPOGRAPHY.sm,
+    fontSize: 10,
     fontWeight: TYPOGRAPHY.semibold,
   },
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: SPACING.xxxl,
+    paddingVertical: SPACING.xxl,
     width: width - (SIDE_MARGIN * 2),
   },
   emptyIcon: {
-    fontSize: 64,
-    marginBottom: SPACING.lg,
+    fontSize: 48,
+    marginBottom: SPACING.md,
   },
   emptyTitle: {
-    fontSize: TYPOGRAPHY.xl,
+    fontSize: TYPOGRAPHY.lg,
     fontWeight: TYPOGRAPHY.semibold,
     color: COLORS.text,
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.xs,
   },
   emptySubtitle: {
-    fontSize: TYPOGRAPHY.lg,
+    fontSize: TYPOGRAPHY.md,
     color: COLORS.textSecondary,
     textAlign: 'center',
   },

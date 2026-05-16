@@ -4,12 +4,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../theme';
+import { useSavedStore } from '../stores/savedStore';
 import { HomeStackParamList, RootTabParamList } from './types';
 
 // Screens
 import HomeScreen from '../screens/HomeScreen';
 import DetailScreen from '../screens/DetailScreen';
-import FavoritesScreen from '../screens/FavoritesScreen';
+import SavedScreen from '../screens/SavedScreen';
 
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -38,6 +39,9 @@ function HomeStackNavigator() {
 }
 
 export default function RootNavigator() {
+  // Selector específico del store Zustand
+  const savedCount = useSavedStore((state) => state.savedProjects.length);
+
   return (
     <NavigationContainer>
       <Tab.Navigator
@@ -48,7 +52,7 @@ export default function RootNavigator() {
             if (route.name === 'Home') {
               iconName = focused ? 'list' : 'list-outline';
             } else {
-              iconName = focused ? 'heart' : 'heart-outline';
+              iconName = focused ? 'bookmark' : 'bookmark-outline';
             }
 
             return <Ionicons name={iconName} size={size} color={color} />;
@@ -68,9 +72,12 @@ export default function RootNavigator() {
           options={{ title: 'Proyectos' }}
         />
         <Tab.Screen
-          name="Favorites"
-          component={FavoritesScreen}
-          options={{ title: 'Favoritos' }}
+          name="Saved"
+          component={SavedScreen}
+          options={{
+            title: 'Guardados',
+            tabBarBadge: savedCount > 0 ? savedCount : undefined,
+          }}
         />
       </Tab.Navigator>
     </NavigationContainer>
