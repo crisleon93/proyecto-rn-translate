@@ -18,6 +18,7 @@ import { mockProjects } from '../data/mockData';
 import { Project } from '../types';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS } from '../theme';
 import type { HomeStackParamList } from '../navigation/types';
+import { useItemsStore } from '../stores/itemsStore';
 
 const getCardWidth = () => {
   const { width } = Dimensions.get('window');
@@ -85,12 +86,15 @@ export default function HomeScreen() {
     );
   }, [searchQuery]);
 
+  const setSelectedItem = useItemsStore((state) => state.setSelectedItem);
+
   const handlePress = useCallback((project: Project) => {
+    setSelectedItem({ id: project.id, projectName: project.projectName });
     navigation.navigate('HomeDetail', {
       id: project.id,
       projectName: project.projectName,
     });
-  }, [navigation]);
+  }, [navigation, setSelectedItem]);
 
   const renderItem: ListRenderItem<Project> = useCallback(({ item }) => {
     const isFav = favorites.has(item.id);
