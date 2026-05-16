@@ -10,4 +10,5 @@ export interface Project {
   deadline: string;
   category: string;
   imageUrl: string;
+  isFavorite: boolean;
 }

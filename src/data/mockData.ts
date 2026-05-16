@@ -13,6 +13,7 @@ export const mockProjects: Project[] = [
     deadline: '2026-03-15',
     category: 'Tecnología',
     imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400',
+    isFavorite: false,
   },
   {
     id: '2',
@@ -26,6 +27,7 @@ export const mockProjects: Project[] = [
     deadline: '2026-02-20',
     category: 'Médico',
     imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400',
+    isFavorite: false,
   },
   {
     id: '3',
@@ -39,6 +41,7 @@ export const mockProjects: Project[] = [
     deadline: '2026-04-10',
     category: 'Educación',
     imageUrl: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400',
+    isFavorite: false,
   },
   {
     id: '4',
@@ -52,6 +55,7 @@ export const mockProjects: Project[] = [
     deadline: '2026-03-01',
     category: 'Legal',
     imageUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400',
+    isFavorite: false,
   },
   {
     id: '5',
@@ -65,6 +69,7 @@ export const mockProjects: Project[] = [
     deadline: '2026-01-30',
     category: 'Turismo',
     imageUrl: 'https://images.unsplash.com/photo-1480796927426-f609979314bd?w=400',
+    isFavorite: false,
   },
   {
     id: '6',
@@ -78,6 +83,7 @@ export const mockProjects: Project[] = [
     deadline: '2026-03-25',
     category: 'Entretenimiento',
     imageUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400',
+    isFavorite: false,
   },
   {
     id: '7',
@@ -91,6 +97,7 @@ export const mockProjects: Project[] = [
     deadline: '2026-05-01',
     category: 'Ambiental',
     imageUrl: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400',
+    isFavorite: false,
   },
   {
     id: '8',
@@ -104,6 +111,7 @@ export const mockProjects: Project[] = [
     deadline: '2026-03-10',
     category: 'Financiero',
     imageUrl: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400',
+    isFavorite: false,
   },
   {
     id: '9',
@@ -117,6 +125,7 @@ export const mockProjects: Project[] = [
     deadline: '2026-02-15',
     category: 'Moda',
     imageUrl: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400',
+    isFavorite: false,
   },
   {
     id: '10',
@@ -130,6 +139,7 @@ export const mockProjects: Project[] = [
     deadline: '2026-04-20',
     category: 'Aeroespacial',
     imageUrl: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=400',
+    isFavorite: false,
   },
   {
     id: '11',
@@ -143,5 +153,6 @@ export const mockProjects: Project[] = [
     deadline: '2026-03-05',
     category: 'Gastronomía',
     imageUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400',
+    isFavorite: false,
   },
 ];

@@ -1,50 +1,80 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, StyleSheet, Pressable, Image } from 'react-native';
+import { mockProjects } from '../data/mockData';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS } from '../theme';
-
-interface FavoriteProject {
-  id: string;
-  projectName: string;
-  clientName: string;
-  translatorName: string;
-  status: string;
-}
-
-const favoriteProjects: FavoriteProject[] = [
-  {
-    id: 'f1',
-    projectName: 'Manual de Usuario App Móvil',
-    clientName: 'TechCorp International',
-    translatorName: 'María González',
-    status: 'En progreso',
-  },
-  {
-    id: 'f2',
-    projectName: 'Documentación Médica',
-    clientName: 'Global Health SA',
-    translatorName: 'Jean Dupont',
-    status: 'Completado',
-  },
-  {
-    id: 'f3',
-    projectName: 'Contrato de Fusión Corporativa',
-    clientName: 'Legal Partners LLC',
-    translatorName: 'Li Wei',
-    status: 'En revisión',
-  },
-];
+import { Project } from '../types';
 
 export default function FavoritesScreen() {
-  const renderItem = ({ item }: { item: FavoriteProject }) => (
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    setFavorites(new Set(['2', '5', '9']));
+  }, []);
+
+  const favoriteProjects = mockProjects.filter(project => favorites.has(project.id));
+
+  const toggleFavorite = (id: string) => {
+    setFavorites(prev => {
+      const newFavorites = new Set(prev);
+      if (newFavorites.has(id)) {
+        newFavorites.delete(id);
+      } else {
+        newFavorites.add(id);
+      }
+      return newFavorites;
+    });
+  };
+
+  const getStatusColor = (status: Project['status']) => {
+    switch (status) {
+      case 'Completado':
+        return COLORS.success;
+      case 'En progreso':
+        return COLORS.warning;
+      case 'Pendiente':
+        return COLORS.danger;
+      case 'En revisión':
+        return COLORS.info;
+      default:
+        return COLORS.textMuted;
+    }
+  };
+
+  const renderItem = ({ item }: { item: Project }) => (
     <View style={styles.card}>
-      <Text style={styles.projectName}>{item.projectName}</Text>
-      <Text style={styles.clientName}>{item.clientName}</Text>
-      <View style={styles.footer}>
-        <Text style={styles.translator}>👤 {item.translatorName}</Text>
-        <View style={styles.statusBadge}>
-          <Text style={styles.statusText}>{item.status}</Text>
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: item.imageUrl }} style={styles.image} />
+        <Pressable
+          style={styles.favoriteButton}
+          onPress={() => toggleFavorite(item.id)}
+        >
+          <Text style={styles.favoriteIcon}>❤️</Text>
+        </Pressable>
+      </View>
+      <View style={styles.content}>
+        <Text style={styles.projectName}>{item.projectName}</Text>
+        <Text style={styles.clientName}>{item.clientName}</Text>
+        <Text style={styles.language}>
+          {item.sourceLanguage} → {item.targetLanguage}
+        </Text>
+        <View style={styles.footer}>
+          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '20' }]}>
+            <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
+              {item.status}
+            </Text>
+          </View>
         </View>
       </View>
+    </View>
+  );
+
+  const ListEmptyComponent = () => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyIcon}>💔</Text>
+      <Text style={styles.emptyTitle}>No hay favoritos</Text>
+      <Text style={styles.emptySubtitle}>
+        Ve a la pestaña Proyectos y toca el corazón para agregar favoritos
+      </Text>
     </View>
   );
 
@@ -52,7 +82,9 @@ export default function FavoritesScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>⭐ Proyectos Favoritos</Text>
-        <Text style={styles.headerSubtitle}>Tus proyectos más importantes</Text>
+        <Text style={styles.headerSubtitle}>
+          {favoriteProjects.length} {favoriteProjects.length === 1 ? 'proyecto' : 'proyectos'} guardados
+        </Text>
       </View>
       <FlatList
         data={favoriteProjects}
@@ -60,6 +92,7 @@ export default function FavoritesScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={ListEmptyComponent}
       />
     </View>
   );
@@ -93,9 +126,31 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: COLORS.card,
     borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.lg,
     marginBottom: SPACING.md,
     ...SHADOWS.small,
+    overflow: 'hidden',
+  },
+  imageContainer: {
+    position: 'relative',
+  },
+  image: {
+    width: '100%',
+    height: 180,
+    resizeMode: 'cover',
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 20,
+    padding: 8,
+  },
+  favoriteIcon: {
+    fontSize: 20,
+  },
+  content: {
+    padding: SPACING.lg,
   },
   projectName: {
     fontSize: TYPOGRAPHY.lg,
@@ -106,26 +161,46 @@ const styles = StyleSheet.create({
   clientName: {
     fontSize: TYPOGRAPHY.md,
     color: COLORS.textSecondary,
+    marginBottom: SPACING.sm,
+  },
+  language: {
+    fontSize: TYPOGRAPHY.md,
+    color: COLORS.accent,
+    fontWeight: TYPOGRAPHY.semibold,
     marginBottom: SPACING.md,
   },
   footer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  translator: {
-    fontSize: TYPOGRAPHY.sm,
-    color: COLORS.textSecondary,
+    justifyContent: 'flex-end',
   },
   statusBadge: {
-    backgroundColor: COLORS.accent + '20',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
     borderRadius: BORDER_RADIUS.full,
   },
   statusText: {
-    fontSize: TYPOGRAPHY.xs,
-    color: COLORS.accent,
+    fontSize: TYPOGRAPHY.sm,
     fontWeight: TYPOGRAPHY.semibold,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.xxxl,
+    paddingHorizontal: SPACING.lg,
+  },
+  emptyIcon: {
+    fontSize: 64,
+    marginBottom: SPACING.lg,
+  },
+  emptyTitle: {
+    fontSize: TYPOGRAPHY.xl,
+    fontWeight: TYPOGRAPHY.semibold,
+    color: COLORS.text,
+    marginBottom: SPACING.sm,
+  },
+  emptySubtitle: {
+    fontSize: TYPOGRAPHY.md,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
   },
 });

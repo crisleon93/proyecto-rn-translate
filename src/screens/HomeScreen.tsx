@@ -48,12 +48,25 @@ export default function HomeScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
   const [cardWidth, setCardWidth] = useState(getCardWidth());
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const subscription = Dimensions.addEventListener('change', () => {
       setCardWidth(getCardWidth());
     });
     return () => subscription?.remove();
+  }, []);
+
+  const toggleFavorite = useCallback((id: string) => {
+    setFavorites(prev => {
+      const newFavorites = new Set(prev);
+      if (newFavorites.has(id)) {
+        newFavorites.delete(id);
+      } else {
+        newFavorites.add(id);
+      }
+      return newFavorites;
+    });
   }, []);
 
   const filteredProjects = useMemo(() => {
@@ -79,34 +92,51 @@ export default function HomeScreen() {
     });
   }, [navigation]);
 
-  const renderItem: ListRenderItem<Project> = useCallback(({ item }) => (
-    <Pressable
-      style={[styles.cardWrapper, { width: cardWidth }]}
-      onPress={() => handlePress(item)}
-    >
-      <View style={styles.card}>
-        <Image source={{ uri: item.imageUrl }} style={styles.image} />
-        <View style={styles.content}>
-          <Text style={styles.projectName} numberOfLines={2}>
-            {item.projectName}
-          </Text>
-          <Text style={styles.clientName} numberOfLines={1}>
-            {item.clientName}
-          </Text>
-          <Text style={styles.language}>
-            {item.sourceLanguage} → {item.targetLanguage}
-          </Text>
-          <View style={styles.footer}>
-            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '20' }]}>
-              <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
-                {item.status}
+  const renderItem: ListRenderItem<Project> = useCallback(({ item }) => {
+    const isFav = favorites.has(item.id);
+    
+    return (
+      <Pressable
+        style={[styles.cardWrapper, { width: cardWidth }]}
+        onPress={() => handlePress(item)}
+      >
+        <View style={styles.card}>
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: item.imageUrl }} style={styles.image} />
+            <Pressable
+              style={styles.favoriteButton}
+              onPress={(e) => {
+                e.stopPropagation();
+                toggleFavorite(item.id);
+              }}
+            >
+              <Text style={styles.favoriteIcon}>
+                {isFav ? '❤️' : '🤍'}
               </Text>
+            </Pressable>
+          </View>
+          <View style={styles.content}>
+            <Text style={styles.projectName} numberOfLines={2}>
+              {item.projectName}
+            </Text>
+            <Text style={styles.clientName} numberOfLines={1}>
+              {item.clientName}
+            </Text>
+            <Text style={styles.language}>
+              {item.sourceLanguage} → {item.targetLanguage}
+            </Text>
+            <View style={styles.footer}>
+              <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '20' }]}>
+                <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
+                  {item.status}
+                </Text>
+              </View>
             </View>
           </View>
         </View>
-      </View>
-    </Pressable>
-  ), [cardWidth, handlePress]);
+      </Pressable>
+    );
+  }, [cardWidth, handlePress, favorites, toggleFavorite]);
 
   const ListEmptyComponent = useCallback(() => (
     <View style={styles.emptyContainer}>
@@ -148,6 +178,7 @@ export default function HomeScreen() {
 
       <Text style={styles.resultsText}>
         {filteredProjects.length} {filteredProjects.length === 1 ? 'proyecto' : 'proyectos'} encontrados
+        {favorites.size > 0 && ` • ${favorites.size} en favoritos`}
       </Text>
 
       <FlatList
@@ -228,10 +259,25 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 4,
   },
+  imageContainer: {
+    position: 'relative',
+  },
   image: {
     width: '100%',
     height: 140,
     resizeMode: 'cover',
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 20,
+    padding: 6,
+    zIndex: 10,
+  },
+  favoriteIcon: {
+    fontSize: 18,
   },
   content: {
     padding: SPACING.md,
